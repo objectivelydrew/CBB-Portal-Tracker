@@ -408,15 +408,7 @@ function parsePctStr(s){
   if(isNaN(n))return 0;
   return(n>0&&n<1)?n*100:n;
 }
-function parseNetStr(s){
-  if(!s||s==='0.00%'||s==='0')return 0;
-  const n=parseFloat(String(s).replace('%',''))||0;
-  // If stored as a decimal fraction (e.g. "+0.1280%" meaning +12.80pp),
-  // multiply by 100. Applies to shooting % nets only; ORtg/DPW nets are
-  // whole numbers well outside the -1..1 range.
-  if(n!==0&&Math.abs(n)<1)return n*100;
-  return n;
-}
+function parseNetStr(s){if(!s||s==='0.00%'||s==='0')return 0;return parseFloat(String(s).replace('%',''))||0;}
 function deltaClass(v,lb){if(v===0)return'neu';return(lb?v<0:v>0)?'pos':'neg';}
 function fmtNet(v,isPct){
   if(v===0)return'—';
