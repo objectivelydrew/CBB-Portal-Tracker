@@ -29,7 +29,9 @@
   /* HEADER */
   .site-header{padding:44px 0 32px;border-bottom:0.5px solid var(--border);margin-bottom:40px;}
   .site-header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
-  .wordmark{display:flex;flex-direction:column;gap:5px;}
+  .wordmark{display:flex;flex-direction:column;gap:5px;cursor:pointer;}
+  .wordmark:hover .wordmark-title{opacity:0.8;}
+  .wordmark:hover .wordmark-super{opacity:0.7;}
   .wordmark-super{font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);}
   .wordmark-title{font-size:30px;font-weight:800;letter-spacing:-0.03em;color:var(--text);line-height:1;}
   .wordmark-title span{color:var(--blue);}
@@ -332,7 +334,7 @@
 <div class="page">
   <header class="site-header">
     <div class="site-header-inner">
-      <div class="wordmark">
+      <div class="wordmark" id="wordmark">
         <div class="wordmark-super">2026 Season</div>
         <div class="wordmark-title">MBB Transfer <span>Portal</span></div>
       </div>
@@ -999,6 +1001,20 @@ function buildTeamCard(s){
     All Rankings
   </button>`;
 }
+
+// ── WORDMARK HOME LINK ──
+$('wordmark').addEventListener('click',()=>{
+  const card=$('teamCard');
+  if(card.classList.contains('visible')){
+    currentSchoolName=null;
+    card.className='team-card';
+    card.innerHTML='';
+    $('searchInput').value='';
+    $('rankingsSection').style.display='';
+    buildTable();
+  }
+  $('rankingsSection').scrollIntoView({behavior:'smooth',block:'start'});
+});
 
 loadData();
 
