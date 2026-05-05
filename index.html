@@ -328,6 +328,36 @@
     .key-metrics-grid{grid-template-columns:1fr;}
     .shooting-grid{grid-template-columns:1fr;}
   }
+  /* PLAYER CARDS */
+  .players-section{margin-top:36px;}
+  .players-group{background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:0;}
+  .players-group-head{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .players-group-title{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);}
+  .players-group-count{font-size:11px;font-weight:600;color:var(--blue);}
+  .players-group.out-group .players-group-title{color:rgba(240,240,245,0.25);}
+  .players-group.out-group .players-group-count{color:rgba(240,240,245,0.3);}
+  .players-group.out-group{border-top:0.5px solid var(--border);border-radius:0 0 14px 14px;border-top-left-radius:0;border-top-right-radius:0;}
+  .players-group.in-group{border-radius:14px 14px 0 0;}
+  .pcards-wrap{padding:10px 12px;display:flex;flex-direction:column;gap:7px;}
+  .pcard{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:11px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .pcard.out-card{opacity:0.7;}
+  .pcard-identity{flex:0 0 160px;flex-shrink:0;}
+  .pcard-name-row{display:flex;align-items:baseline;gap:7px;}
+  .pcard-name{font-size:13px;font-weight:700;color:var(--text);}
+  .pcard-pos{font-size:11px;font-weight:600;color:var(--muted2);}
+  .pcard-physical{font-size:11px;color:var(--muted2);margin-top:3px;}
+  .pcard-school{font-size:11px;color:var(--muted);margin-top:2px;}
+  .pcard-school span{color:rgba(240,240,245,0.6);}
+  .pcard-portal{font-size:11px;color:var(--muted2);font-style:italic;margin-top:2px;}
+  .pcard-divider{width:0.5px;background:var(--border2);align-self:stretch;flex-shrink:0;}
+  .pcard-stats{display:flex;gap:14px;flex-wrap:wrap;align-items:center;flex:1;}
+  .pstat{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:36px;}
+  .pstat-label{font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted2);}
+  .pstat-val{font-size:14px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+  .pstat-val.blue{color:var(--blue);}
+  .pstat-val.purple{color:var(--purple);}
+  .pstat-val.muted{color:var(--muted2);}
+  .players-loading{padding:24px;text-align:center;font-size:12px;color:var(--muted2);}
 </style>
 </head>
 <body>
@@ -399,7 +429,7 @@
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbzZlop5sJYGwr6sfE8UWKYw0BoXMWxom2EdQ2-oEPg1BkpPQz9BNVIi08Fu1PckMsyP/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbyobzfbnKyqmehTmiLpzpMHnHNvCLUYZS31quTULG-QqQUKRp9o8Hn9qR5LnVNeADcj/exec';
 const $=id=>document.getElementById(id);
 const pf=v=>parseFloat(String(v).replace('%',''))||0;
 const pi=v=>parseInt(v)||0;
@@ -701,12 +731,10 @@ function renderSuggestions(){
 function closeSearch(){$('searchResults').classList.remove('open');currentSuggestions=[];searchIdx=-1;}
 
 // SHOW TEAM
-function showTeam(name){
+async function showTeam(name){
   const s=allSchools.find(x=>x['School']===name);if(!s)return;
   currentSchoolName=name;
   $('searchInput').value=name;
-
-  // Hide overall table, show team card + conf table
   $('rankingsSection').style.display='none';
 
   const card=$('teamCard');
@@ -714,15 +742,13 @@ function showTeam(name){
   card.innerHTML=buildTeamCard(s);
   card.scrollIntoView({behavior:'smooth',block:'start'});
 
-  // Wire conf table view btns
+  // Wire conf table and back buttons immediately
   card.querySelectorAll('.view-btn[data-school]').forEach(btn=>{
     btn.addEventListener('click',()=>showTeam(btn.dataset.school));
   });
   card.querySelectorAll('tbody tr[data-school]').forEach(tr=>{
     tr.addEventListener('click',e=>{if(e.target.closest('.view-btn'))return;showTeam(tr.dataset.school);});
   });
-
-  // Wire back buttons (top + bottom)
   function doBack(){
     currentSchoolName=null;
     card.className='team-card';
@@ -736,6 +762,23 @@ function showTeam(name){
   if(backBtn) backBtn.addEventListener('click',doBack);
   const backBtnBottom=card.querySelector('#backBtnBottom');
   if(backBtnBottom) backBtnBottom.addEventListener('click',doBack);
+
+  // Fetch player data and inject into player section
+  const playerSection=card.querySelector('#playerSection');
+  if(playerSection){
+    try{
+      const res=await fetch(`${API_URL}?school=${encodeURIComponent(name)}`);
+      const json=await res.json();
+      const players=json.players||{in:[],out:[]};
+      playerSection.innerHTML=buildPlayerCards(players);
+      // Wire view buttons in conf table that may have appeared
+      playerSection.querySelectorAll('.view-btn[data-school]').forEach(btn=>{
+        btn.addEventListener('click',()=>showTeam(btn.dataset.school));
+      });
+    }catch(e){
+      playerSection.innerHTML='<p style="color:var(--muted2);font-size:13px;padding:16px;">Could not load player data.</p>';
+    }
+  }
 }
 
 // BUILD TEAM CARD
@@ -984,6 +1027,12 @@ function buildTeamCard(s){
     </div>
   </div>
 
+  <!-- PLAYER SECTION -->
+  <div class="section-label" style="margin-top:32px;">Portal Players</div>
+  <div class="players-section" id="playerSection">
+    <div class="players-loading"><div class="spinner" style="width:20px;height:20px;margin:0 auto 8px;"></div>Loading players…</div>
+  </div>
+
   <!-- CONFERENCE TABLE -->
   <div class="conf-section">
     <div class="conf-section-header">
@@ -1015,6 +1064,63 @@ $('wordmark').addEventListener('click',()=>{
   }
   $('rankingsSection').scrollIntoView({behavior:'smooth',block:'start'});
 });
+
+// BUILD PLAYER CARDS
+function buildPlayerCards(players){
+  const fmt=v=>v!==null&&v!==undefined?v:'—';
+  const fmtPct=v=>(v===null||v===undefined||v===0)?'—':v.toFixed(1)+'%';
+  // threePct special: 0 means no attempts, show —
+  const fmtThree=v=>(v===null||v===undefined||v===0)?'—':v.toFixed(1)+'%';
+
+  function pcard(p){
+    const isOut=p.direction==='out';
+    const schoolLine=isOut
+      ?(p.to?`To <span>${p.to}</span>`:`<span class="pcard-portal">Still in portal</span>`)
+      :`From <span>${p.from||'—'}</span>`;
+    const physical=[p.height,p.weight?p.weight+' lbs':null].filter(Boolean).join(' · ')||'—';
+    return`<div class="pcard${isOut?' out-card':''}">
+      <div class="pcard-identity">
+        <div class="pcard-name-row">
+          <span class="pcard-name">${p.name||'—'}</span>
+          <span class="pcard-pos">${p.position||''}</span>
+        </div>
+        <div class="pcard-physical">${physical}</div>
+        <div class="pcard-school">${isOut&&!p.to?schoolLine:`<span class="pcard-school">${schoolLine}</span>`}</div>
+      </div>
+      <div class="pcard-divider"></div>
+      <div class="pcard-stats">
+        <div class="pstat"><span class="pstat-label">%Min</span><span class="pstat-val">${fmt(p.minPct)}</span></div>
+        <div class="pstat"><span class="pstat-label">P-ORtg</span><span class="pstat-val blue">${fmt(p.ortg)}</span></div>
+        <div class="pstat"><span class="pstat-label">D-PW</span><span class="pstat-val purple">${p.dpw!==null&&p.dpw!==undefined?p.dpw.toFixed(2):'—'}</span></div>
+        <div class="pstat"><span class="pstat-label">ARate</span><span class="pstat-val">${fmt(p.arate)}</span></div>
+        <div class="pstat"><span class="pstat-label">TORate</span><span class="pstat-val">${fmt(p.torate)}</span></div>
+        <div class="pstat"><span class="pstat-label">eFG%</span><span class="pstat-val">${fmtPct(p.efg)}</span></div>
+        <div class="pstat"><span class="pstat-label">2P%</span><span class="pstat-val">${fmtPct(p.twoPct)}</span></div>
+        <div class="pstat"><span class="pstat-label">3P%</span><span class="pstat-val">${fmtThree(p.threePct)}</span></div>
+        <div class="pstat"><span class="pstat-label">FT%</span><span class="pstat-val">${fmtPct(p.ftPct)}</span></div>
+      </div>
+    </div>`;
+  }
+
+  const inCards=(players.in||[]).map(pcard).join('');
+  const outCards=(players.out||[]).map(pcard).join('');
+
+  return`
+  <div class="players-group in-group">
+    <div class="players-group-head">
+      <span class="players-group-title">Players In</span>
+      <span class="players-group-count">${(players.in||[]).length} players</span>
+    </div>
+    <div class="pcards-wrap">${inCards||'<div class="players-loading">No incoming players found.</div>'}</div>
+  </div>
+  <div class="players-group out-group">
+    <div class="players-group-head">
+      <span class="players-group-title">Players Out</span>
+      <span class="players-group-count" style="color:rgba(240,240,245,0.3);">${(players.out||[]).length} players</span>
+    </div>
+    <div class="pcards-wrap">${outCards||'<div class="players-loading">No outgoing players found.</div>'}</div>
+  </div>`;
+}
 
 loadData();
 
