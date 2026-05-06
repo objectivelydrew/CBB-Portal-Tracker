@@ -398,18 +398,18 @@
   <div class="info-overlay" id="infoOverlay">
     <div class="info-panel" id="infoPanel">
       <button class="info-close" id="infoClose">✕</button>
-      <div class="info-headline">These rankings are a means of tracking how schools get better or worse through the transfer portal.</div>
-      <p class="info-body">This tracker shows how much each school improved or declined through the transfer portal. It is <strong>not</strong> a preseason power ranking. It does not account for returning players, incoming freshmen, or junior college transfers. Only players who moved through the D1 transfer portal with available box score data are included.</p>
-      <p class="info-body">It's possible for a team to land one of the best players in the portal and still rank low. That's because other portal moves and the quality of players that were lost can still bring before &amp; after ratings down.</p>
+      <div class="info-headline">This is <em>not</em> a power ranking.</div>
+      <p class="info-body">Some sites track the moves. Other sites track the stats.<br>This tracker creates a comprehensive look at how schools get better or worse by using the transfer portal. Its focus is on players who have made D1 portal moves, and their available box score data. The tracker does not account for a school's returning players, incoming freshmen, or junior college transfers. </p>
+      <p class="info-body">Teams who rank highest are reflecting the <em>most improvement</em>. It's possible for a team to land one of the best players in the portal and still rank low. Other portal moves and quality of players lost can still bring before &amp; after<br>ratings down.</p>
       <div class="info-divider"></div>
       <p class="info-body"><strong>How it works</strong></p>
       <div class="info-list">
         <div class="info-list-item"><span class="info-dash">-</span><span>Every player in the portal with available box score statistics is rated on offense and defense.</span></div>
-        <div class="info-list-item"><span class="info-dash">-</span><span>As players move out of rosters and into new ones, they establish before-and-after baselines for their new school.</span></div>
+        <div class="info-list-item"><span class="info-dash">-</span><span>As players move out of rosters and into new ones, they establish before &amp; after baselines for their new school.</span></div>
         <div class="info-list-item"><span class="info-dash">-</span><span>The tracker records the net difference across all commonly tracked stats and produces a composite portal score for each school.</span></div>
       </div>
       <div class="info-divider"></div>
-      <p class="info-body">Because scouting grades are subjective assessments, not data from actual games, rankings based on them will look very different from what's shown here. Other portal rankings may be based entirely on those types of grades instead of by the objective in-game data found here.</p>
+      <p class="info-body">Because scouting grades are subjective assessments and do not reflect data from actual games, rankings based upon them will look very different from what's shown here. Other portal rankings may be based entirely on those types of grades instead of by the objective in-game data found here.</p>
       <p class="info-body">For more information on Defense: Possessions Won (D-PW), <a href="https://objectivelydrew.substack.com/p/college-basketballs-2026-transfer" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline;text-underline-offset:3px;">click here</a>.</p>
     </div>
   </div>
@@ -1068,7 +1068,11 @@ $('wordmark').addEventListener('click',()=>{
 // BUILD PLAYER CARDS
 function buildPlayerCards(players){
   const fmt=v=>v!==null&&v!==undefined?v:'—';
-  const fmtPct=v=>(v===null||v===undefined||v===0)?'—':v.toFixed(1)+'%';
+  const fmtPct=v=>{
+    if(v===null||v===undefined||v===0)return'—';
+    const n=parseFloat(v.toFixed(1));
+    return(n>=100?'100':n.toFixed(1))+'%';
+  };
   // threePct special: 0 means no attempts, show —
   const fmtThree=v=>(v===null||v===undefined||v===0)?'—':v.toFixed(1)+'%';
 
@@ -1145,8 +1149,8 @@ $('infoOverlay').addEventListener('click',e=>{if(e.target===$('infoOverlay'))clo
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfo();});
 </script>
 <footer style="text-align:center;padding:40px 24px 24px;font-family:'Inter',sans-serif;font-size:11px;color:rgba(240,240,245,0.25);letter-spacing:0.04em;line-height:1.8;">
-  © 2026 Drew Falkman. All rights reserved.<br>
-  The application, ranking formula, visual design, and composite output are proprietary.<br>
+  © 2026 Drew Christien. All rights reserved.<br>
+  The application, ranking formula, D-PW formula, visual design, and composite output are proprietary.<br>
   Player statistics are sourced from third-party providers and remain the property of their respective owners.<br>
   Unauthorized reproduction or distribution of this application or its output is prohibited.
 </footer>
