@@ -29,9 +29,7 @@
   /* HEADER */
   .site-header{padding:44px 0 32px;border-bottom:0.5px solid var(--border);margin-bottom:40px;}
   .site-header-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
-  .wordmark{display:flex;flex-direction:column;gap:5px;cursor:pointer;}
-  .wordmark:hover .wordmark-title{opacity:0.8;}
-  .wordmark:hover .wordmark-super{opacity:0.7;}
+  .wordmark{display:flex;flex-direction:column;gap:5px;}
   .wordmark-super{font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);}
   .wordmark-title{font-size:30px;font-weight:800;letter-spacing:-0.03em;color:var(--text);line-height:1;}
   .wordmark-title span{color:var(--blue);}
@@ -307,10 +305,6 @@
   td.stat-pos{color:var(--green);font-weight:600;}
   td.stat-neg{color:var(--red);font-weight:600;}
   td.stat-neu{color:var(--muted);font-weight:400;}
-  td.stat-neutral{color:var(--text);font-weight:400;}
-  td.ortg-after{color:var(--blue);font-weight:700;}
-  tr.subhead-row th{font-size:9px;color:var(--muted2);font-weight:500;padding-top:0;padding-bottom:4px;letter-spacing:0.05em;}
-  .rank-move-col{font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums;}
   /* legacy aliases */
   td.stat-good{color:var(--green);font-weight:600;}
   td.stat-bad{color:var(--red);font-weight:600;}
@@ -332,43 +326,13 @@
     .key-metrics-grid{grid-template-columns:1fr;}
     .shooting-grid{grid-template-columns:1fr;}
   }
-  /* PLAYER CARDS */
-  .players-section{margin-top:36px;}
-  .players-group{background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:0;}
-  .players-group-head{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .players-group-title{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);}
-  .players-group-count{font-size:11px;font-weight:600;color:var(--blue);}
-  .players-group.out-group .players-group-title{color:rgba(240,240,245,0.25);}
-  .players-group.out-group .players-group-count{color:rgba(240,240,245,0.3);}
-  .players-group.out-group{border-top:0.5px solid var(--border);border-radius:0 0 14px 14px;border-top-left-radius:0;border-top-right-radius:0;}
-  .players-group.in-group{border-radius:14px 14px 0 0;}
-  .pcards-wrap{padding:10px 12px;display:flex;flex-direction:column;gap:7px;}
-  .pcard{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:11px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-  .pcard.out-card{opacity:0.7;}
-  .pcard-identity{flex:0 0 160px;flex-shrink:0;}
-  .pcard-name-row{display:flex;align-items:baseline;gap:7px;}
-  .pcard-name{font-size:13px;font-weight:700;color:var(--text);}
-  .pcard-pos{font-size:11px;font-weight:600;color:var(--muted2);}
-  .pcard-physical{font-size:11px;color:var(--muted2);margin-top:3px;}
-  .pcard-school{font-size:11px;color:var(--muted);margin-top:2px;}
-  .pcard-school span{color:rgba(240,240,245,0.6);}
-  .pcard-portal{font-size:11px;color:var(--muted2);font-style:italic;margin-top:2px;}
-  .pcard-divider{width:0.5px;background:var(--border2);align-self:stretch;flex-shrink:0;}
-  .pcard-stats{display:flex;gap:14px;flex-wrap:wrap;align-items:center;flex:1;}
-  .pstat{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:36px;}
-  .pstat-label{font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted2);}
-  .pstat-val{font-size:14px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
-  .pstat-val.blue{color:var(--blue);}
-  .pstat-val.purple{color:var(--purple);}
-  .pstat-val.muted{color:var(--muted2);}
-  .players-loading{padding:24px;text-align:center;font-size:12px;color:var(--muted2);}
 </style>
 </head>
 <body>
 <div class="page">
   <header class="site-header">
     <div class="site-header-inner">
-      <div class="wordmark" id="wordmark">
+      <div class="wordmark">
         <div class="wordmark-super">2026 Season</div>
         <div class="wordmark-title">MBB Transfer <span>Portal</span></div>
       </div>
@@ -402,18 +366,18 @@
   <div class="info-overlay" id="infoOverlay">
     <div class="info-panel" id="infoPanel">
       <button class="info-close" id="infoClose">✕</button>
-      <div class="info-headline">This is <em>not</em> a power ranking.</div>
-      <p class="info-body">Some sites track the moves. Other sites track the stats.<br>This tracker creates a comprehensive look at how schools get better or worse by using the transfer portal. Its focus is on players who have made D1 portal moves, and their available box score data. The tracker does not account for a school's returning players, incoming freshmen, or junior college transfers. </p>
-      <p class="info-body">Teams who rank highest are reflecting the <em>most improvement</em>. It's possible for a team to land one of the best players in the portal and still rank low. Other portal moves and quality of players lost can still bring before &amp; after<br>ratings down.</p>
+      <div class="info-headline">These rankings are a means of tracking how schools get better or worse through the transfer portal.</div>
+      <p class="info-body">This tracker shows how much each school improved or declined through the transfer portal. It is <strong>not</strong> a preseason power ranking. It does not account for returning players, incoming freshmen, or junior college transfers. Only players who moved through the D1 transfer portal with available box score data are included.</p>
+      <p class="info-body">It's possible for a team to land one of the best players in the portal and still rank low. That's because other portal moves and the quality of players that were lost can still bring before &amp; after ratings down.</p>
       <div class="info-divider"></div>
       <p class="info-body"><strong>How it works</strong></p>
       <div class="info-list">
         <div class="info-list-item"><span class="info-dash">-</span><span>Every player in the portal with available box score statistics is rated on offense and defense.</span></div>
-        <div class="info-list-item"><span class="info-dash">-</span><span>As players move out of rosters and into new ones, they establish before &amp; after baselines for their new school.</span></div>
+        <div class="info-list-item"><span class="info-dash">-</span><span>As players move out of rosters and into new ones, they establish before-and-after baselines for their new school.</span></div>
         <div class="info-list-item"><span class="info-dash">-</span><span>The tracker records the net difference across all commonly tracked stats and produces a composite portal score for each school.</span></div>
       </div>
       <div class="info-divider"></div>
-      <p class="info-body">Because scouting grades are subjective assessments and do not reflect data from actual games, rankings based upon them will look very different from what's shown here. Other portal rankings may be based entirely on those types of grades instead of by the objective in-game data found here.</p>
+      <p class="info-body">Because scouting grades are subjective assessments, not data from actual games, rankings based on them will look very different from what's shown here. Other portal rankings may be based entirely on those types of grades instead of by the objective in-game data found here.</p>
       <p class="info-body">For more information on Defense: Possessions Won (D-PW), <a href="https://objectivelydrew.substack.com/p/college-basketballs-2026-transfer" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline;text-underline-offset:3px;">click here</a>.</p>
     </div>
   </div>
@@ -569,7 +533,6 @@ function barH(val,lo,hi){
 // STATE
 let allSchools=[],sortKey='Overall Portal Rank',sortDir=1,searchIdx=-1,currentSuggestions=[];
 let currentSchoolName=null;
-let ortgOutRanks={}, ortgInRanks={};
 
 // LOAD
 async function loadData(){
@@ -580,11 +543,6 @@ async function loadData(){
     const count=allSchools.length;
     pill.className=count>0?'meta-pill success':'meta-pill error';
     pill.textContent=count>0?`${count} Schools`:'0 Schools';
-    // Compute T-ORtg Out and In ranks across all schools
-    const byOut=[...allSchools].sort((a,b)=>pf(b['T-ORtg Out'])-pf(a['T-ORtg Out']));
-    const byIn =[...allSchools].sort((a,b)=>pf(b['T-ORtg In']) -pf(a['T-ORtg In']));
-    byOut.forEach((s,i)=>ortgOutRanks[s['School']]=i+1);
-    byIn.forEach ((s,i)=>ortgInRanks [s['School']]=i+1);
     buildConfFilter();buildTable();
   }catch(e){
     pill.className='meta-pill error';pill.textContent='Load Failed';
@@ -608,7 +566,6 @@ const TABLE_COLS=[
   {label:'In',key:'Players In',sortable:true,special:'in'},
   {label:'Out',key:'Players Out',sortable:true,special:'out'},
   {label:'T-ORtg',key:'T-ORtg Net +/-',sortable:true,lowerBetter:false,noCaps:true},
-  {label:'2025\u2013\u201926',key:'_ortgRank',sortable:false,special:'ortgRank',noCaps:true},
   {label:'eFG%',key:'eFG% Net +/-',sortable:true,lowerBetter:false,noCaps:true},
   {label:'',key:'_view',sortable:false},
 ];
@@ -649,14 +606,6 @@ function buildTable(){
         if(c.special==='conf'){html+=`<td class="conf-col">${s['Conference']||'—'}</td>`;return;}
         if(c.special==='in'){html+=`<td class="players-in">${s['Players In']||0}</td>`;return;}
         if(c.special==='out'){html+=`<td class="players-out">${s['Players Out']||0}</td>`;return;}
-        if(c.special==='ortgRank'){
-          const rOut=ortgOutRanks[s['School']]||0;
-          const rIn=ortgInRanks[s['School']]||0;
-          const diff=rOut-rIn; // positive = moved up (lower rank number = better)
-          const cls=diff>0?'pos':diff<0?'neg':'neu';
-          const disp=rOut&&rIn?`#${rOut} → #${rIn}`:'—';
-          html+=`<td class="stat-${cls} rank-move-col">${disp}</td>`;return;
-        }
         const n=parseNetStr(s[c.key]);
         const cls=deltaClass(n,c.lowerBetter);
         const disp=n!==0?(n>0?'+'+Math.abs(n).toFixed(1):'-'+Math.abs(n).toFixed(1)):'—';
@@ -687,31 +636,30 @@ $('tableFilter').addEventListener('input',buildTable);
 function buildConfTable(school){
   const conf=school['Conference'];
   if(!conf)return'<p style="color:var(--muted2);font-size:13px;">No conference data.</p>';
+
+  // Composite score: T-ORtg Net (weight 4) + D-PW Net (weight 2), same ratio as overall rank
+  const confScore = s => {
+    const ortgNet = parseNetStr(s['T-ORtg Net +/-']);
+    const dpwNet  = parseNetStr(s['Team D-PW Net +/-']);
+    return (ortgNet * 4 + dpwNet * 2) / 6;
+  };
+
   const confSchools=allSchools
     .filter(s=>s['Conference']===conf)
-    .sort((a,b)=>pf(b['T-ORtg In'])-pf(a['T-ORtg In']));
+    .sort((a,b)=>confScore(b)-confScore(a));
 
-  let html=`<table><thead><tr>
-    <th>Rank</th><th>School</th><th>In</th><th>Out</th><th class="no-caps" colspan="2">T-ORtg</th><th class="no-caps">eFG% Δ</th><th></th>
-  </tr>
-  <tr class="subhead-row">
-    <th></th><th></th><th></th><th></th><th class="no-caps subhead">Before</th><th class="no-caps subhead">After</th><th></th><th></th>
+  let html=`<table style="width:100%;"><thead><tr>
+    <th>Conf Rank</th><th>School</th><th>In</th><th>Out</th><th class="no-caps">T-ORtg</th><th class="no-caps">eFG%</th><th style="width:80px;"></th>
   </tr></thead><tbody>`;
   confSchools.forEach((s,i)=>{
     const isCurrent=s['School']===school['School'];
-    const ortgOut=pf(s['T-ORtg Out']);
-    const ortgIn=pf(s['T-ORtg In']);
     const ortgN=parseNetStr(s['T-ORtg Net +/-']);
     const efgN=parseNetStr(s['eFG% Net +/-']);
-    const ortgOutStr=ortgOut?ortgOut.toFixed(1):'—';
-    const ortgInStr=ortgIn?ortgIn.toFixed(1):'—';
     html+=`<tr data-school="${(s['School']||'').replace(/"/g,'&quot;')}" ${isCurrent?'class="current-school"':''}>
       <td class="rank-col">${i+1}</td>
       <td class="school-col">${s['School']||'—'}</td>
       <td class="players-in">${s['Players In']||0}</td>
       <td class="players-out">${s['Players Out']||0}</td>
-      <td class="stat-neutral">${ortgOutStr}</td>
-      <td class="stat-neutral ortg-after">${ortgInStr}</td>
       <td class="stat-${deltaClass(ortgN,false)}">${ortgN!==0?(ortgN>0?'+':'')+ortgN.toFixed(1):'—'}</td>
       <td class="stat-${deltaClass(efgN,false)}">${efgN!==0?(efgN>0?'+':'')+efgN.toFixed(2)+'%':'—'}</td>
       <td><button class="view-btn" data-school="${(s['School']||'').replace(/"/g,'&quot;')}">View ↗</button></td>
@@ -758,10 +706,12 @@ function renderSuggestions(){
 function closeSearch(){$('searchResults').classList.remove('open');currentSuggestions=[];searchIdx=-1;}
 
 // SHOW TEAM
-async function showTeam(name){
+function showTeam(name){
   const s=allSchools.find(x=>x['School']===name);if(!s)return;
   currentSchoolName=name;
   $('searchInput').value=name;
+
+  // Hide overall table, show team card + conf table
   $('rankingsSection').style.display='none';
 
   const card=$('teamCard');
@@ -769,13 +719,15 @@ async function showTeam(name){
   card.innerHTML=buildTeamCard(s);
   card.scrollIntoView({behavior:'smooth',block:'start'});
 
-  // Wire conf table and back buttons immediately
+  // Wire conf table view btns
   card.querySelectorAll('.view-btn[data-school]').forEach(btn=>{
     btn.addEventListener('click',()=>showTeam(btn.dataset.school));
   });
   card.querySelectorAll('tbody tr[data-school]').forEach(tr=>{
     tr.addEventListener('click',e=>{if(e.target.closest('.view-btn'))return;showTeam(tr.dataset.school);});
   });
+
+  // Wire back buttons (top + bottom)
   function doBack(){
     currentSchoolName=null;
     card.className='team-card';
@@ -789,23 +741,6 @@ async function showTeam(name){
   if(backBtn) backBtn.addEventListener('click',doBack);
   const backBtnBottom=card.querySelector('#backBtnBottom');
   if(backBtnBottom) backBtnBottom.addEventListener('click',doBack);
-
-  // Fetch player data and inject into player section
-  const playerSection=card.querySelector('#playerSection');
-  if(playerSection){
-    try{
-      const res=await fetch(`${API_URL}?school=${encodeURIComponent(name)}`);
-      const json=await res.json();
-      const players=json.players||{in:[],out:[]};
-      playerSection.innerHTML=buildPlayerCards(players);
-      // Wire view buttons in conf table that may have appeared
-      playerSection.querySelectorAll('.view-btn[data-school]').forEach(btn=>{
-        btn.addEventListener('click',()=>showTeam(btn.dataset.school));
-      });
-    }catch(e){
-      playerSection.innerHTML='<p style="color:var(--muted2);font-size:13px;padding:16px;">Could not load player data.</p>';
-    }
-  }
 }
 
 // BUILD TEAM CARD
@@ -1054,12 +989,6 @@ function buildTeamCard(s){
     </div>
   </div>
 
-  <!-- PLAYER SECTION -->
-  <div class="section-label" style="margin-top:32px;">Portal Players</div>
-  <div class="players-section" id="playerSection">
-    <div class="players-loading"><div class="spinner" style="width:20px;height:20px;margin:0 auto 8px;"></div>Loading players…</div>
-  </div>
-
   <!-- CONFERENCE TABLE -->
   <div class="conf-section">
     <div class="conf-section-header">
@@ -1076,81 +1005,6 @@ function buildTeamCard(s){
     </svg>
     All Rankings
   </button>`;
-}
-
-// ── WORDMARK HOME LINK ──
-$('wordmark').addEventListener('click',()=>{
-  const card=$('teamCard');
-  if(card.classList.contains('visible')){
-    currentSchoolName=null;
-    card.className='team-card';
-    card.innerHTML='';
-    $('searchInput').value='';
-    $('rankingsSection').style.display='';
-    buildTable();
-  }
-  $('rankingsSection').scrollIntoView({behavior:'smooth',block:'start'});
-});
-
-// BUILD PLAYER CARDS
-function buildPlayerCards(players){
-  const fmt=v=>v!==null&&v!==undefined?v:'—';
-  const fmtPct=v=>{
-    if(v===null||v===undefined||v===0)return'—';
-    const n=parseFloat(v.toFixed(1));
-    return(n>=99.9?'100':n.toFixed(1))+'%';
-  };
-  // threePct special: 0 means no attempts, show —
-  const fmtThree=v=>(v===null||v===undefined||v===0)?'—':v.toFixed(1)+'%';
-
-  function pcard(p){
-    const isOut=p.direction==='out';
-    const schoolLine=isOut
-      ?(p.to?`To <span>${p.to}</span>`:`<span class="pcard-portal">Still in portal</span>`)
-      :`From <span>${p.from||'—'}</span>`;
-    const physical=[p.height,p.weight?p.weight+' lbs':null].filter(Boolean).join(' · ')||'—';
-    return`<div class="pcard${isOut?' out-card':''}">
-      <div class="pcard-identity">
-        <div class="pcard-name-row">
-          <span class="pcard-name">${p.name||'—'}</span>
-          <span class="pcard-pos">${p.position||''}</span>
-        </div>
-        <div class="pcard-physical">${physical}</div>
-        <div class="pcard-school">${isOut&&!p.to?schoolLine:`<span class="pcard-school">${schoolLine}</span>`}</div>
-      </div>
-      <div class="pcard-divider"></div>
-      <div class="pcard-stats">
-        <div class="pstat"><span class="pstat-label">%Min</span><span class="pstat-val">${fmt(p.minPct)}</span></div>
-        <div class="pstat"><span class="pstat-label">P-ORtg</span><span class="pstat-val blue">${fmt(p.ortg)}</span></div>
-        <div class="pstat"><span class="pstat-label">D-PW</span><span class="pstat-val purple">${p.dpw!==null&&p.dpw!==undefined?p.dpw.toFixed(2):'—'}</span></div>
-        <div class="pstat"><span class="pstat-label">ARate</span><span class="pstat-val">${fmt(p.arate)}</span></div>
-        <div class="pstat"><span class="pstat-label">TORate</span><span class="pstat-val">${fmt(p.torate)}</span></div>
-        <div class="pstat"><span class="pstat-label">eFG%</span><span class="pstat-val">${fmtPct(p.efg)}</span></div>
-        <div class="pstat"><span class="pstat-label">2P%</span><span class="pstat-val">${fmtPct(p.twoPct)}</span></div>
-        <div class="pstat"><span class="pstat-label">3P%</span><span class="pstat-val">${fmtThree(p.threePct)}</span></div>
-        <div class="pstat"><span class="pstat-label">FT%</span><span class="pstat-val">${fmtPct(p.ftPct)}</span></div>
-      </div>
-    </div>`;
-  }
-
-  const inCards=(players.in||[]).map(pcard).join('');
-  const outCards=(players.out||[]).map(pcard).join('');
-
-  return`
-  <div class="players-group in-group">
-    <div class="players-group-head">
-      <span class="players-group-title">Players In</span>
-      <span class="players-group-count">${(players.in||[]).length} players</span>
-    </div>
-    <div class="pcards-wrap">${inCards||'<div class="players-loading">No incoming players found.</div>'}</div>
-  </div>
-  <div class="players-group out-group">
-    <div class="players-group-head">
-      <span class="players-group-title">Players Out</span>
-      <span class="players-group-count" style="color:rgba(240,240,245,0.3);">${(players.out||[]).length} players</span>
-    </div>
-    <div class="pcards-wrap">${outCards||'<div class="players-loading">No outgoing players found.</div>'}</div>
-  </div>`;
 }
 
 loadData();
@@ -1177,8 +1031,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfo();});
 </script>
 <footer style="text-align:center;padding:40px 24px 24px;font-family:'Inter',sans-serif;font-size:11px;color:rgba(240,240,245,0.25);letter-spacing:0.04em;line-height:1.8;">
   © 2026 Drew Christien. All rights reserved.<br>
-  The application, ranking formula, D-PW formula, visual design, and composite output are proprietary.<br>
-  Player statistics are sourced from third-party providers and remain the property of their respective owners.<br>
+  The application, ranking formula, visual design, and composite output are proprietary.<br>
+  Player statistics are sourced from public third-party providers and remain the property of their respective owners.<br>
   Unauthorized reproduction or distribution of this application or its output is prohibited.
 </footer>
 </body>
