@@ -569,7 +569,6 @@ function barH(val,lo,hi){
 // STATE
 let allSchools=[],sortKey='Overall Portal Rank',sortDir=1,searchIdx=-1,currentSuggestions=[];
 let currentSchoolName=null;
-let ortgOutRanks={}, ortgInRanks={};
 
 // LOAD
 async function loadData(){
@@ -580,11 +579,6 @@ async function loadData(){
     const count=allSchools.length;
     pill.className=count>0?'meta-pill success':'meta-pill error';
     pill.textContent=count>0?`${count} Schools`:'0 Schools';
-    // Compute T-ORtg Out and In ranks across all schools
-    const byOut=[...allSchools].sort((a,b)=>pf(b['T-ORtg Out'])-pf(a['T-ORtg Out']));
-    const byIn =[...allSchools].sort((a,b)=>pf(b['T-ORtg In']) -pf(a['T-ORtg In']));
-    byOut.forEach((s,i)=>ortgOutRanks[s['School']]=i+1);
-    byIn.forEach ((s,i)=>ortgInRanks [s['School']]=i+1);
     buildConfFilter();buildTable();
   }catch(e){
     pill.className='meta-pill error';pill.textContent='Load Failed';
@@ -607,9 +601,8 @@ const TABLE_COLS=[
   {label:'Conf',key:'Conference',sortable:true,special:'conf'},
   {label:'In',key:'Players In',sortable:true,special:'in'},
   {label:'Out',key:'Players Out',sortable:true,special:'out'},
-  {label:'T-ORtg',key:'T-ORtg Net +/-',sortable:true,lowerBetter:false,noCaps:true},
-  {label:'2025\u2013\u201926',key:'_ortgRank',sortable:false,special:'ortgRank',noCaps:true},
-  {label:'eFG%',key:'eFG% Net +/-',sortable:true,lowerBetter:false,noCaps:true},
+  {label:'OAR',key:'OAR Net',sortable:true,lowerBetter:false,noCaps:true,special:'oarNet'},
+  {label:'D-PW',key:'Team D-PW Net +/-',sortable:true,lowerBetter:false,noCaps:true},
   {label:'',key:'_view',sortable:false},
 ];
 
@@ -649,13 +642,11 @@ function buildTable(){
         if(c.special==='conf'){html+=`<td class="conf-col">${s['Conference']||'—'}</td>`;return;}
         if(c.special==='in'){html+=`<td class="players-in">${s['Players In']||0}</td>`;return;}
         if(c.special==='out'){html+=`<td class="players-out">${s['Players Out']||0}</td>`;return;}
-        if(c.special==='ortgRank'){
-          const rOut=ortgOutRanks[s['School']]||0;
-          const rIn=ortgInRanks[s['School']]||0;
-          const diff=rOut-rIn; // positive = moved up (lower rank number = better)
-          const cls=diff>0?'pos':diff<0?'neg':'neu';
-          const disp=rOut&&rIn?`#${rOut} → #${rIn}`:'—';
-          html+=`<td class="stat-${cls} rank-move-col">${disp}</td>`;return;
+        if(c.special==='oarNet'){
+          const n=pf(s['OAR Net']);
+          const cls=deltaClass(n,false);
+          const disp=n!==0?(n>0?'+'+n.toFixed(2):n.toFixed(2)):'—';
+          html+=`<td class="stat-${cls}">${disp}</td>`;return;
         }
         const n=parseNetStr(s[c.key]);
         const cls=deltaClass(n,c.lowerBetter);
@@ -688,11 +679,11 @@ function buildConfTable(school){
   const conf=school['Conference'];
   if(!conf)return'<p style="color:var(--muted2);font-size:13px;">No conference data.</p>';
 
-  // Composite score: T-ORtg Net (weight 4) + D-PW Net (weight 2), same ratio as overall rank
+  // Composite score: OAR Net (65%) + D-PW Net (35%) — mirrors overall ranking formula
   const confScore=s=>{
-    const ortgNet=parseNetStr(s['T-ORtg Net +/-']);
+    const oarNet=pf(s['OAR Net']);
     const dpwNet=parseNetStr(s['Team D-PW Net +/-']);
-    return(ortgNet*4+dpwNet*2)/6;
+    return(oarNet*0.65)+(dpwNet*0.35);
   };
 
   const confSchools=allSchools
@@ -700,18 +691,18 @@ function buildConfTable(school){
     .sort((a,b)=>confScore(b)-confScore(a));
 
   let html=`<table style="width:100%;"><thead><tr>
-    <th>Conf Rank</th><th>School</th><th>In</th><th>Out</th><th class="no-caps">T-ORtg</th><th class="no-caps">D-PW</th><th style="width:80px;"></th>
+    <th>Conf Rank</th><th>School</th><th>In</th><th>Out</th><th class="no-caps">OAR</th><th class="no-caps">D-PW</th><th style="width:80px;"></th>
   </tr></thead><tbody>`;
   confSchools.forEach((s,i)=>{
     const isCurrent=s['School']===school['School'];
-    const ortgN=parseNetStr(s['T-ORtg Net +/-']);
+    const oarN=pf(s['OAR Net']);
     const dpwN=parseNetStr(s['Team D-PW Net +/-']);
     html+=`<tr data-school="${(s['School']||'').replace(/"/g,'&quot;')}" ${isCurrent?'class="current-school"':''}>
       <td class="rank-col">${i+1}</td>
       <td class="school-col">${s['School']||'—'}</td>
       <td class="players-in">${s['Players In']||0}</td>
       <td class="players-out">${s['Players Out']||0}</td>
-      <td class="stat-${deltaClass(ortgN,false)}">${ortgN!==0?(ortgN>0?'+':'')+ortgN.toFixed(1):'—'}</td>
+      <td class="stat-${deltaClass(oarN,false)}">${oarN!==0?(oarN>0?'+':'')+oarN.toFixed(2):'—'}</td>
       <td class="stat-${deltaClass(dpwN,false)}">${dpwN!==0?(dpwN>0?'+':'')+dpwN.toFixed(1):'—'}</td>
       <td><button class="view-btn" data-school="${(s['School']||'').replace(/"/g,'&quot;')}">View ↗</button></td>
     </tr>`;
@@ -815,6 +806,10 @@ function buildTeamCard(s){
   const playersIn=pi(s['Players In']),playersOut=pi(s['Players Out']),netPlayers=pi(s['Net Players']);
 
   const ortgOut=pf(s['T-ORtg Out']),ortgIn=pf(s['T-ORtg In']),ortgNet=parseNetStr(s['T-ORtg Net +/-']),ortgRank=pi(s['T-ORtg Rank']);
+  // v7: OAR school-level values
+  const oarOut=pf(s['OAR Out']),oarIn=pf(s['OAR In']),oarNet=pf(s['OAR Net']);
+  // Derive OAR net rank client-side by sorting all schools descending
+  const oarRank=(()=>{const sorted=[...allSchools].sort((a,b)=>pf(b['OAR Net'])-pf(a['OAR Net']));const idx=sorted.findIndex(x=>x['School']===s['School']);return idx>=0?idx+1:0;})();
   const dpwOut=pf(s['Team D-PW Out']),dpwIn=pf(s['Team D-PW In']),dpwNet=parseNetStr(s['Team D-PW Net +/-']),dpwRank=pi(s['Team D-PW Rank']);
   const efgOut=parsePctStr(s['eFG% Out']),efgIn=parsePctStr(s['eFG% In']),efgNet=parseNetStr(s['eFG% Net +/-']),efgRank=pi(s['eFG% Rank']);
   const twoOut=parsePctStr(s['2P% Out']),twoIn=parsePctStr(s['2P% In']),twoNet=parseNetStr(s['2P% Net +/-']),twoRank=pi(s['2P% Rank']);
@@ -839,7 +834,8 @@ function buildTeamCard(s){
   const netStr=netPlayers>0?`+${netPlayers}`:`${netPlayers}`;
   const rkChg=r=>r?`#${r}`:'—';
 
-  // Isometric bar heights
+  // Isometric bar heights — OAR uses signed scale centered at 0, range roughly -30 to +50
+  const oarOutH=barH(Math.max(0,oarOut+30),0,80),oarInH=barH(Math.max(0,oarIn+30),0,80);
   const ortgOutH=barH(ortgOut,90,130),ortgInH=barH(ortgIn,90,130);
   const dpwOutH=barH(dpwOut,3,10),dpwInH=barH(dpwIn,3,10);
 
@@ -933,27 +929,27 @@ function buildTeamCard(s){
     <div class="metric-card blue-card">
       <div class="mc-top-row">
         <div class="mc-left">
-          <div class="mc-subtitle">Team Offensive Rating</div>
-          <div class="mc-acronym blue">T-ORtg</div>
+          <div class="mc-subtitle">Offense Above Replacement</div>
+          <div class="mc-acronym blue">OAR</div>
         </div>
         <div class="mc-bars-right">
           <div class="mc-bar-col">
-            <div class="mc-bar-val" style="color:var(--muted2);">${ortgOut>0?ortgOut.toFixed(1):'—'}</div>
-            <div style="height:136px;display:flex;align-items:flex-end;">${isoBarSVG(ortgOutH,'#4f8ef7',true)}</div>
+            <div class="mc-bar-val" style="color:var(--muted2);">${oarOut!==0?oarOut.toFixed(1):'—'}</div>
+            <div style="height:136px;display:flex;align-items:flex-end;">${isoBarSVG(oarOutH,'#4f8ef7',true)}</div>
             <div class="mc-bar-lbl" style="color:var(--muted2);">Out</div>
           </div>
           <div class="mc-bar-col">
-            <div class="mc-bar-val" style="color:#4f8ef7;font-size:12px;font-weight:800;">${ortgIn>0?ortgIn.toFixed(1):'—'}</div>
-            <div style="height:136px;display:flex;align-items:flex-end;">${isoBarSVG(ortgInH,'#4f8ef7',false)}</div>
+            <div class="mc-bar-val" style="color:#4f8ef7;font-size:12px;font-weight:800;">${oarIn!==0?oarIn.toFixed(1):'—'}</div>
+            <div style="height:136px;display:flex;align-items:flex-end;">${isoBarSVG(oarInH,'#4f8ef7',false)}</div>
             <div class="mc-bar-lbl" style="color:#4f8ef7;">In</div>
           </div>
         </div>
       </div>
       <div class="mc-num-row">
-        <div class="mc-main-num blue">${ortgIn>0?ortgIn.toFixed(1):'—'}</div>
-        ${bigDelta(ortgNet,false,1,false)}
+        <div class="mc-main-num blue">${oarIn!==0?oarIn.toFixed(1):'—'}</div>
+        ${bigDelta(oarNet,false,2,false)}
       </div>
-      <div class="mc-rank">${rkChg(ortgRank)} nationally</div>
+      <div class="mc-rank">${oarRank?`#${oarRank} nationally`:'—'} <span style="color:var(--muted);font-size:11px;font-weight:400;">· vs. portal median ORtg baseline</span></div>
     </div>
 
     <div class="metric-card purple-card">
@@ -984,9 +980,10 @@ function buildTeamCard(s){
   </div>
 
   <!-- SHOOTING & EFFICIENCY -->
-  <div class="section-label">Shooting & Efficiency</div>
+  <div class="section-label">Offensive Stats & Efficiency</div>
   <div class="shooting-grid">
     <div class="shooting-card">
+      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',90,130)}
       ${shootBar('eFG%',efgIn,efgOut,efgNet,efgRank,'#4f8ef7',40,65)}
       ${shootBar('2P%',twoIn,twoOut,twoNet,twoRank,'#34d399',40,70)}
       ${shootBar('3P%',thrIn,thrOut,thrNet,thrRank,'#fbbf24',25,45)}
@@ -1120,8 +1117,9 @@ function buildPlayerCards(players){
       <div class="pcard-divider"></div>
       <div class="pcard-stats">
         <div class="pstat"><span class="pstat-label">%Min</span><span class="pstat-val">${fmt(p.minPct)}</span></div>
-        <div class="pstat"><span class="pstat-label">P-ORtg</span><span class="pstat-val blue">${fmt(p.ortg)}</span></div>
+        <div class="pstat"><span class="pstat-label">OAR</span><span class="pstat-val ${p.oar!==null&&p.oar!==undefined?(p.oar>=0?'blue':'muted'):''}">${p.oar!==null&&p.oar!==undefined?(p.oar>=0?'+':'')+p.oar.toFixed(2):'—'}</span></div>
         <div class="pstat"><span class="pstat-label">D-PW</span><span class="pstat-val purple">${p.dpw!==null&&p.dpw!==undefined?p.dpw.toFixed(2):'—'}</span></div>
+        <div class="pstat"><span class="pstat-label">P-ORtg</span><span class="pstat-val">${fmt(p.ortg)}</span></div>
         <div class="pstat"><span class="pstat-label">ARate</span><span class="pstat-val">${fmt(p.arate)}</span></div>
         <div class="pstat"><span class="pstat-label">TORate</span><span class="pstat-val">${fmt(p.torate)}</span></div>
         <div class="pstat"><span class="pstat-label">eFG%</span><span class="pstat-val">${fmtPct(p.efg)}</span></div>
