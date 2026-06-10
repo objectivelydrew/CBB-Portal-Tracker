@@ -840,14 +840,14 @@ function buildTeamCard(s){
   const dpwOutH=barH(dpwOut,3,10),dpwInH=barH(dpwIn,3,10);
 
   // Shooting bar builder
-  function shootBar(label,inV,outV,net,rank,color,lo,hi){
+  function shootBar(label,inV,outV,net,rank,color,lo,hi,isPct=true){
     const range=hi-lo||1;
     const outPct=Math.max(0,Math.min(100,((outV-lo)/range)*100));
     const inPct=Math.max(0,Math.min(100,((inV-lo)/range)*100));
     const cls=deltaClass(net,false);
-    const netStr=net!==0?(net>0?'+'+net.toFixed(2)+'%':net.toFixed(2)+'%'):'—';
-    const inDisp=inV>0?inV.toFixed(1)+'%':'—';
-    const outDisp=outV>0?outV.toFixed(1)+'%':'—';
+    const netStr=net!==0?(isPct?(net>0?'+'+net.toFixed(2)+'%':net.toFixed(2)+'%'):(net>0?'+':'')+net.toFixed(1)):'—';
+    const inDisp=inV>0?(isPct?inV.toFixed(1)+'%':inV.toFixed(1)):'—';
+    const outDisp=outV>0?(isPct?outV.toFixed(1)+'%':outV.toFixed(1)):'—';
     return`<div class="shoot-row">
       <div class="shoot-header">
         <span class="shoot-name">${label}</span>
@@ -983,7 +983,7 @@ function buildTeamCard(s){
   <div class="section-label">Offensive Stats & Efficiency</div>
   <div class="shooting-grid">
     <div class="shooting-card">
-      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',90,130)}
+      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',90,130,false)}
       ${shootBar('eFG%',efgIn,efgOut,efgNet,efgRank,'#4f8ef7',40,65)}
       ${shootBar('2P%',twoIn,twoOut,twoNet,twoRank,'#34d399',40,70)}
       ${shootBar('3P%',thrIn,thrOut,thrNet,thrRank,'#fbbf24',25,45)}
