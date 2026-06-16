@@ -440,11 +440,19 @@ const pi=v=>parseInt(v)||0;
 
 function parsePctStr(s){
   if(!s)return 0;
+  if(typeof s==='number') return (s>0&&s<1)?s*100:s;
   const n=parseFloat(String(s).replace('%',''));
   if(isNaN(n))return 0;
   return(n>0&&n<1)?n*100:n;
 }
-function parseNetStr(s){if(!s||s==='0.00%'||s==='0')return 0;return parseFloat(String(s).replace('%',''))||0;}
+function parseNetStr(s){
+  if(!s||s===0||s==='0.00%'||s==='0')return 0;
+  if(typeof s==='number') return (s>-1&&s<1&&s!==0)?s*100:s;
+  const n=parseFloat(String(s).replace('%',''));
+  if(isNaN(n)||n===0)return 0;
+  const hasPercent=String(s).includes('%');
+  return(!hasPercent&&n>-1&&n<1)?n*100:n;
+}
 function deltaClass(v,lb){if(v===0)return'neu';return(lb?v<0:v>0)?'pos':'neg';}
 function fmtNet(v,isPct){
   if(v===0)return'—';
