@@ -447,11 +447,15 @@ function parsePctStr(s){
 }
 function parseNetStr(s){
   if(!s||s===0||s==='0.00%'||s==='0')return 0;
-  if(typeof s==='number') return (s>-1&&s<1&&s!==0)?s*100:s;
+  // Percentage fields always carry an explicit "%" in the source string, so
+  // there's no ambiguity to resolve here — just strip it and parse. Do NOT
+  // attempt to "guess" and rescale plain (non-percent) values like D-PW,
+  // T-ORtg, ARate, or TORate nets: a legitimate small delta such as -0.6
+  // is a valid value on its own and must not be multiplied by 100.
+  if(typeof s==='number')return s;
   const n=parseFloat(String(s).replace('%',''));
-  if(isNaN(n)||n===0)return 0;
-  const hasPercent=String(s).includes('%');
-  return(!hasPercent&&n>-1&&n<1)?n*100:n;
+  if(isNaN(n))return 0;
+  return n;
 }
 function deltaClass(v,lb){if(v===0)return'neu';return(lb?v<0:v>0)?'pos':'neg';}
 function fmtNet(v,isPct){
@@ -687,16 +691,11 @@ function buildConfTable(school){
   const conf=school['Conference'];
   if(!conf)return'<p style="color:var(--muted2);font-size:13px;">No conference data.</p>';
 
-  // Composite score: OAR Net (65%) + D-PW Net (35%) — mirrors overall ranking formula
-  const confScore=s=>{
-    const oarNet=pf(s['OAR Net']);
-    const dpwNet=parseNetStr(s['Team D-PW Net +/-']);
-    return(oarNet*0.65)+(dpwNet*0.35);
-  };
-
+  // Sort by each school's existing Overall Portal Rank so conference order
+  // always matches the main rankings table (lower rank number = better).
   const confSchools=allSchools
     .filter(s=>s['Conference']===conf)
-    .sort((a,b)=>confScore(b)-confScore(a));
+    .sort((a,b)=>pf(a['Overall Portal Rank'])-pf(b['Overall Portal Rank']));
 
   let html=`<table style="width:100%;"><thead><tr>
     <th>Conf Rank</th><th>School</th><th>In</th><th>Out</th><th class="no-caps">OAR</th><th class="no-caps">D-PW</th><th style="width:80px;"></th>
