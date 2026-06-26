@@ -856,7 +856,7 @@ function buildTeamCard(s){
     const hasNet=hasOut&&hasIn;
     const cls=hasNet?deltaClass(net,false):'neu';
     const netStr=(hasNet&&net!==0)?(isPct?(net>0?'+'+net.toFixed(2)+'%':net.toFixed(2)+'%'):(net>0?'+':'')+net.toFixed(1)):'—';
-    const inDisp=hasIn?(isPct?inV.toFixed(1)+'%':inV.toFixed(1)):'—';
+    const inDisp=hasIn?(isPct?inV.toFixed(1)+'%':inV.toFixed(1)):(hasOut?(isPct?outV.toFixed(1)+'%':outV.toFixed(1)):'—');
     const outDisp=hasOut?(isPct?outV.toFixed(1)+'%':outV.toFixed(1)):'—';
     const brightColor=net>=0?'#34d399':'#f87171';
     const dimColor=net>=0?'rgba(52,211,153,0.25)':'rgba(248,113,113,0.25)';
