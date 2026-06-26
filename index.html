@@ -860,14 +860,16 @@ function buildTeamCard(s){
     const outDisp=hasOut?(isPct?outV.toFixed(1)+'%':outV.toFixed(1)):'—';
     const brightColor=net>=0?'#34d399':'#f87171';
     const dimColor=net>=0?'rgba(52,211,153,0.25)':'rgba(248,113,113,0.25)';
-    // 3 segments left to right:
+    // 3 segments left to right (two-sided case):
     // 1. dimmed color: 0 → min(outPct,inPct) — the shared baseline
     // 2. bright color: min → max — the actual change
     // 3. gray: max → 100% — the remaining unused range
     // When one side is missing (no players on that side of the transaction),
-    // there's no "from X to Y" delta to show — render only the side that
-    // exists as a single bright marker, rather than fabricating a 0%
-    // anchor point that would visually imply "started from nothing."
+    // there's no "from X to Y" delta to show, and filling the track from 0%
+    // to the lone value would visually overstate it as if it were a big gain
+    // from nothing. Instead, show a single dot marker at the real position —
+    // it reads as "here's where this team's incoming/outgoing stat sits"
+    // rather than implying a change that doesn't exist.
     let barInner;
     if(hasOut&&hasIn){
       const minPct=Math.min(outPct,inPct);
@@ -875,9 +877,9 @@ function buildTeamCard(s){
       barInner=`<div style="position:absolute;left:0;top:0;height:100%;width:${minPct}%;background:${dimColor};"></div>
         <div style="position:absolute;left:${minPct}%;top:0;height:100%;width:${maxPct-minPct}%;background:${brightColor};"></div>`;
     }else if(hasIn){
-      barInner=`<div style="position:absolute;left:0;top:0;height:100%;width:${inPct}%;background:${color};"></div>`;
+      barInner=`<div style="position:absolute;left:calc(${inPct}% - 5px);top:50%;width:10px;height:10px;border-radius:50%;background:${color};transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,0.08);"></div>`;
     }else if(hasOut){
-      barInner=`<div style="position:absolute;left:0;top:0;height:100%;width:${outPct}%;background:${dimColor};"></div>`;
+      barInner=`<div style="position:absolute;left:calc(${outPct}% - 5px);top:50%;width:10px;height:10px;border-radius:50%;background:${dimColor.replace('0.25','0.9')};transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,0.08);"></div>`;
     }else{
       barInner='';
     }
@@ -891,7 +893,7 @@ function buildTeamCard(s){
           <span class="shoot-rank">${rank?'#'+rank:''}</span>
         </span>
       </div>
-      <div class="shoot-track" style="background:var(--surface3);">
+      <div class="shoot-track" style="background:var(--surface3);${(hasOut&&hasIn)?'':'overflow:visible;'}">
         ${barInner}
       </div>
       <div class="shoot-sublabel">${subLabel}</div>
@@ -979,7 +981,7 @@ function buildTeamCard(s){
         </div>
       </div>
       <div class="mc-num-row">
-        <div class="mc-main-num blue">${oarIn!==0?oarIn.toFixed(1):'—'}</div>
+        <div class="mc-main-num blue">${oarIn!==0?oarIn.toFixed(1):(oarOut!==0?oarOut.toFixed(1):'—')}</div>
         ${bigDelta(oarNet,false,2,false)}
       </div>
       <div class="mc-rank">${oarRank?`#${oarRank} nationally`:'—'} <span style="color:var(--muted);font-size:11px;font-weight:400;">· vs. portal median ORtg baseline</span></div>
@@ -1005,7 +1007,7 @@ function buildTeamCard(s){
         </div>
       </div>
       <div class="mc-num-row">
-        <div class="mc-main-num purple">${dpwIn>0?dpwIn.toFixed(1):'—'}</div>
+        <div class="mc-main-num purple">${dpwIn>0?dpwIn.toFixed(1):(dpwOut>0?dpwOut.toFixed(1):'—')}</div>
         ${bigDelta(dpwNet,false,1,false)}
       </div>
       <div class="mc-rank">${rkChg(dpwRank)} nationally</div>
