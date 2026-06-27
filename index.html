@@ -438,9 +438,6 @@ const $=id=>document.getElementById(id);
 const pf=v=>parseFloat(String(v).replace('%',''))||0;
 const pi=v=>parseInt(v)||0;
 
-function isBlankCell(s){
-  return s===undefined||s===null||s===''||s==='—'||s==='-';
-}
 function parsePctStr(s){
   if(!s)return 0;
   if(typeof s==='number') return (s>0&&s<1)?s*100:s;
@@ -814,6 +811,11 @@ function buildTeamCard(s){
   const rank=pi(s['Overall Portal Rank']);
   const pctile=pctOfTotal(rank,total);
   const playersIn=pi(s['Players In']),playersOut=pi(s['Players Out']),netPlayers=pi(s['Net Players']);
+  // %Min is the most reliable signal that a side of the transaction has
+  // real on-court data behind it. A player who never recorded minutes has
+  // no trustworthy individual stats, even if some of those stat cells
+  // happen to come through the API as 0 rather than blank/null.
+  const minOut=parsePctStr(s['%Min Out']),minIn=parsePctStr(s['%Min In']);
 
   const ortgOut=pf(s['T-ORtg Out']),ortgIn=pf(s['T-ORtg In']),ortgNet=parseNetStr(s['T-ORtg Net +/-']),ortgRank=pi(s['T-ORtg Rank']);
   // v7: OAR school-level values
@@ -880,13 +882,13 @@ function buildTeamCard(s){
       barInner=`<div style="position:absolute;left:0;top:0;height:100%;width:${minPct}%;background:${dimColor};"></div>
         <div style="position:absolute;left:${minPct}%;top:0;height:100%;width:${maxPct-minPct}%;background:${brightColor};"></div>`;
     }else if(hasIn){
-      barInner=`<div style="position:absolute;left:calc(${inPct}% - 5px);top:50%;width:10px;height:10px;border-radius:50%;background:${color};transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,0.08);"></div>`;
+      barInner=`<div style="position:absolute;left:calc(${inPct}% - 5px);top:50%;width:10px;height:10px;border-radius:50%;background:#34d399;transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,0.08);"></div>`;
     }else if(hasOut){
-      barInner=`<div style="position:absolute;left:calc(${outPct}% - 5px);top:50%;width:10px;height:10px;border-radius:50%;background:${dimColor.replace('0.25','0.9')};transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,0.08);"></div>`;
+      barInner=`<div style="position:absolute;left:calc(${outPct}% - 5px);top:50%;width:10px;height:10px;border-radius:50%;background:#f87171;transform:translateY(-50%);box-shadow:0 0 0 3px rgba(255,255,255,0.08);"></div>`;
     }else{
       barInner='';
     }
-    const subLabel=hasOut?`From ${outDisp}`:(hasIn?'No outgoing data':'No data');
+    const subLabel=hasOut?`From ${outDisp}`:(hasIn?'Average incoming data':'No data');
     return`<div class="shoot-row">
       <div class="shoot-header">
         <span class="shoot-name">${label}</span>
@@ -1021,11 +1023,11 @@ function buildTeamCard(s){
   <div class="section-label">Offensive Stats & Efficiency</div>
   <div class="shooting-grid">
     <div class="shooting-card">
-      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',70,145,false,playersIn,playersOut,!isBlankCell(s['T-ORtg In']),!isBlankCell(s['T-ORtg Out']))}
-      ${shootBar('eFG%',efgIn,efgOut,efgNet,efgRank,'#4f8ef7',25,100,true,playersIn,playersOut,!isBlankCell(s['eFG% In']),!isBlankCell(s['eFG% Out']))}
-      ${shootBar('2P%',twoIn,twoOut,twoNet,twoRank,'#34d399',25,100,true,playersIn,playersOut,!isBlankCell(s['2P% In']),!isBlankCell(s['2P% Out']))}
-      ${shootBar('3P%',thrIn,thrOut,thrNet,thrRank,'#fbbf24',0,75,true,playersIn,playersOut,!isBlankCell(s['3P% In']),!isBlankCell(s['3P% Out']))}
-      ${shootBar('FT%',ftIn,ftOut,ftNet,ftRank,'#a78bfa',25,100,true,playersIn,playersOut,!isBlankCell(s['FT% In']),!isBlankCell(s['FT% Out']))}
+      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',70,145,false,playersIn,playersOut,minIn>0,minOut>0)}
+      ${shootBar('eFG%',efgIn,efgOut,efgNet,efgRank,'#4f8ef7',25,100,true,playersIn,playersOut,minIn>0,minOut>0)}
+      ${shootBar('2P%',twoIn,twoOut,twoNet,twoRank,'#34d399',25,100,true,playersIn,playersOut,minIn>0,minOut>0)}
+      ${shootBar('3P%',thrIn,thrOut,thrNet,thrRank,'#fbbf24',0,75,true,playersIn,playersOut,minIn>0,minOut>0)}
+      ${shootBar('FT%',ftIn,ftOut,ftNet,ftRank,'#a78bfa',25,100,true,playersIn,playersOut,minIn>0,minOut>0)}
     </div>
     <div class="ratio-card">
       <div class="ratio-card-title">Assist-to-Turnover Ratio</div>
