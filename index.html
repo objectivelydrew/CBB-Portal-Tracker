@@ -438,6 +438,9 @@ const $=id=>document.getElementById(id);
 const pf=v=>parseFloat(String(v).replace('%',''))||0;
 const pi=v=>parseInt(v)||0;
 
+function isBlankCell(s){
+  return s===undefined||s===null||s===''||s==='—'||s==='-';
+}
 function parsePctStr(s){
   if(!s)return 0;
   if(typeof s==='number') return (s>0&&s<1)?s*100:s;
@@ -847,10 +850,10 @@ function buildTeamCard(s){
   const dpwOutH=barH(dpwOut,3,10),dpwInH=barH(dpwIn,3,10);
 
   // Shooting bar builder
-  function shootBar(label,inV,outV,net,rank,color,lo,hi,isPct=true,playersIn=1,playersOut=1){
+  function shootBar(label,inV,outV,net,rank,color,lo,hi,isPct=true,playersIn=1,playersOut=1,inHasData=true,outHasData=true){
     const range=hi-lo||1;
-    const hasOut=playersOut>0&&outV!==null&&outV!==undefined;
-    const hasIn=playersIn>0&&inV!==null&&inV!==undefined;
+    const hasOut=playersOut>0&&outV!==null&&outV!==undefined&&outHasData;
+    const hasIn=playersIn>0&&inV!==null&&inV!==undefined&&inHasData;
     const outPct=hasOut?Math.max(0,Math.min(100,((outV-lo)/range)*100)):null;
     const inPct=hasIn?Math.max(0,Math.min(100,((inV-lo)/range)*100)):null;
     const hasNet=hasOut&&hasIn;
@@ -1018,11 +1021,11 @@ function buildTeamCard(s){
   <div class="section-label">Offensive Stats & Efficiency</div>
   <div class="shooting-grid">
     <div class="shooting-card">
-      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',70,145,false,playersIn,playersOut)}
-      ${shootBar('eFG%',efgIn,efgOut,efgNet,efgRank,'#4f8ef7',25,100,true,playersIn,playersOut)}
-      ${shootBar('2P%',twoIn,twoOut,twoNet,twoRank,'#34d399',25,100,true,playersIn,playersOut)}
-      ${shootBar('3P%',thrIn,thrOut,thrNet,thrRank,'#fbbf24',0,75,true,playersIn,playersOut)}
-      ${shootBar('FT%',ftIn,ftOut,ftNet,ftRank,'#a78bfa',25,100,true,playersIn,playersOut)}
+      ${shootBar('P-ORtg',ortgIn,ortgOut,ortgNet,ortgRank,'#4f8ef7',70,145,false,playersIn,playersOut,!isBlankCell(s['T-ORtg In']),!isBlankCell(s['T-ORtg Out']))}
+      ${shootBar('eFG%',efgIn,efgOut,efgNet,efgRank,'#4f8ef7',25,100,true,playersIn,playersOut,!isBlankCell(s['eFG% In']),!isBlankCell(s['eFG% Out']))}
+      ${shootBar('2P%',twoIn,twoOut,twoNet,twoRank,'#34d399',25,100,true,playersIn,playersOut,!isBlankCell(s['2P% In']),!isBlankCell(s['2P% Out']))}
+      ${shootBar('3P%',thrIn,thrOut,thrNet,thrRank,'#fbbf24',0,75,true,playersIn,playersOut,!isBlankCell(s['3P% In']),!isBlankCell(s['3P% Out']))}
+      ${shootBar('FT%',ftIn,ftOut,ftNet,ftRank,'#a78bfa',25,100,true,playersIn,playersOut,!isBlankCell(s['FT% In']),!isBlankCell(s['FT% Out']))}
     </div>
     <div class="ratio-card">
       <div class="ratio-card-title">Assist-to-Turnover Ratio</div>
